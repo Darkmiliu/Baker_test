@@ -14,9 +14,30 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    signingConfigs {//签名的配置
+        release {
+          storeFile file("mykey.jks")
+          storePassword '000'
+          keyAlias '0000'
+          keyPassword '0000'
+        }
+    }
 
     buildTypes {
         release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            applicationVariants.all { variant - 
+            if (variant.buildType.name.equals('release')) { //如果是release版本
+              variant.outputs.each { output -  def outputFile = output.outputFile
+                if (outputFile != null && outputFile.name.endsWith('.apk')) { //查找所有的apk
+                  def fileName = "BakerTest_${releaseTime()}_${defaultConfig.versionName}.apk" //重新定义apk的名称
+                  output.outputFile = new File(outputFile.parent, fileName) //outputFile.parent参数可以改成你你想要的发布路径
+                }
+              }
+            }
+        }
+        debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -34,4 +55,8 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+}
+def releaseTime() {
+    return new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC")) //年月日
+  // return new Date().format("yyyyMMdd HH-mm-ss", TimeZone.getTimeZone("GMT+8:00")) //年月日时分秒
 }
