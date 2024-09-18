@@ -16,10 +16,10 @@ android {
     }
     signingConfigs {//签名的配置
         release {
-          storeFile file("mykey.jks")
-          storePassword '000'
-          keyAlias '0000'
-          keyPassword '0000'
+          storeFile file("test.jks")
+          storePassword '123456'
+          keyAlias 'key0'
+          keyPassword '123456'
         }
     }
 
@@ -27,14 +27,13 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            applicationVariants.all { variant - 
-            if (variant.buildType.name.equals('release')) { //如果是release版本
-              variant.outputs.each { output -  def outputFile = output.outputFile
-                if (outputFile != null && outputFile.name.endsWith('.apk')) { //查找所有的apk
-                  def fileName = "BakerTest_${releaseTime()}_${defaultConfig.versionName}.apk" //重新定义apk的名称
-                  output.outputFile = new File(outputFile.parent, fileName) //outputFile.parent参数可以改成你你想要的发布路径
+            android.applicationVariants.all { variant ->
+                variant.outputs.all {
+                    outputFileName  ="baker" + "_v" +
+                            defaultConfig.versionName + "_" + defaultConfig.versionCode + "_" +
+                            new Date().format("yyyy-MM-dd") + "_" + buildType.name +
+                            ".apk"
                 }
-              }
             }
         }
         debug {
